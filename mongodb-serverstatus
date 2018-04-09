@@ -1,0 +1,16 @@
+#!/bin/sh
+
+MONGO=`which mongo`
+
+if [ ! -x "$MONGO" ]; then
+    echo "MongoDB Shell не установлен, или проверьте переменную \$PATH=$PATH"
+    exit 1
+fi
+
+$MONGO --eval 'db.serverStatus()' | \
+sed -E \
+    -e 1,3d \
+    -e 's/NumberLong\("?([0-9]+)"?\)/\1/g' \
+    -e 's/Timestamp\("?([0-9]+), [0-9]+"?\)/\1/g' \
+    -e 's/(ISODate|ObjectId)\((.+)\)/\2/g' \
+    -e 's/BinData\([0-9]+,(.+)\)/\1/g'
